@@ -28,4 +28,25 @@ router.post("/", async (req, res) => {
     }
 });
 
+// DELETE /expenses/:id - Delete an expense by id
+router.delete("/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const result = await pool.query(
+            "DELETE FROM expenses WHERE id = $1 RETURNING *",
+            [id]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: "Expense not found" });
+        }
+
+        res.json({ message: "Expense deleted successfully" });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ error: "Server error" });
+    }
+});
+
 module.exports = router;
